@@ -1,56 +1,43 @@
-# Mathematical
+# PyMathematical
 
 Quickly convert math equations into beautiful SVGs (or PNGs/MathML).
 
-[![Build Status](https://travis-ci.org/gjtorikian/mathematical.svg?branch=master)](https://travis-ci.org/gjtorikian/mathematical) [![Gem Version](https://badge.fury.io/rb/mathematical.svg)](http://badge.fury.io/rb/mathematical)
+This is a Python translation of the Ruby library Mathematical by Garen Torikian. The rest of this readme is based on the original readme, with the necessary modifications for using the python syntax.
 
 ![Mathematical](https://i.imgur.com/JC7HT32.gif)
 
 ## Installation
-
-Add this line to your application's Gemfile:
-
-    gem 'mathematical'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install mathematical
-
-**Note:** you'll probably need to run [`script/bootstrap`](script/bootstrap) to fetch all the necessary dependencies.
+TODO
 
 ## Usage
 
 The simplest way to do this is
 
-``` ruby
-require 'mathematical'
+``` python
+from mathematical import Mathematical
 
-Mathematical.new.render(string_with_math)
+Mathematical().render(string_with_math)
 ```
 
 `string_with_math` should just be a string of TeX math. The default delimiters are `$..$` for inline and `$$..$$` for display. These can be changed by options--see below.
 
-The output will be a hash, with keys that depend on the format you want:
+The output will be a dictionary, with keys that depend on the format you want:
 
 * If you asked for an SVG, you'll get:
-  * `:width`: the width of the resulting image
-  * `:height`: the height of the resulting image
-  * `:data`: the actual string of SVG
+  * `"width"`: the width of the resulting image
+  * `"height"`: the height of the resulting image
+  * `"data"`: the actual string of SVG
 * If you asked for a PNG, you'll get:
-  * `:width`: the width of the resulting image
-  * `:height`: the height of the resulting image
-  * `:data`: the PNG data
+  * `"width"`: the width of the resulting image
+  * `"height"`: the height of the resulting image
+  * `"data"`: the PNG data
 * If you asked for MathML, you'll get:
-  * `:data`: the MathML data
+  * `"data"`: the MathML data
 * If you pass in invalid TeX, you'll get:
-  * `:data`: the original invalid TeX
-  * `:exception`: the error class (with message)
+  * `"data"`: the original invalid TeX
+  * `"exception"`: the error class (with message)
 
-**Note**: If you pass in invalid TeX, an error is not raised, but a message *is* printed to STDERR. It is the caller's responsibility to check for `:exception` and act on it.
+**Note**: If you pass in invalid TeX, an error is not raised, but a message *is* printed to STDERR. It is the caller's responsibility to check for `"exception"` and act on it.
 
 `render` just converts a single equation. There are several other methods you can use:
 
@@ -62,41 +49,38 @@ The output will be a hash, with keys that depend on the format you want:
 
 Rather than just a string, you can also provide an array of math inputs:
 
-``` ruby
-inputs = []
-inputs << '$\pi$'
-inputs << '$not__thisisnotreal$'
-inputs << '$\alpha$'
+``` python
+inputs = ['$\pi$', '$not__thisisnotreal$', '$\alpha$']
 
-Mathematical.new.render(inputs)
+mathematical.render(inputs)
 ```
 
-This returns an array of hashes, rendering the indices. For example, for the above, you will receive the following output:
+This returns an array of dictionaries, rendering the indices. For example, for the above, you will receive the following output:
 
 ```
-[ {:data => "...", :width => ... }, { :data => '$not__thisisnotreal$', :exception => "...", {:data => "...", :width => ... }]
+[ {"data": "...", "width": ... }, { "data": '$not__thisisnotreal$', "exception": "...", {"data": "...", "width": ... }]
 ```
 
 That is, while the first and last elements are valid TeX math, the middle one is not, so the same string is returned. As with single strings, the error message is printed to STDERR, but not raised.
 
 ### Options
 
-`Mathematical.new` takes an optional hash to define a few options:
+The `Mathematical()` takes an optional hash to define a few options:
 
 | Name | Description | Default
 |------|-------------|--------
-| `:ppi` | A double determining the pixels per inch of the resulting SVG | `72.0`
-| `:zoom` | A double determining the zoom level of the resulting SVG | `1.0`
-| `:base64` | A boolean determining whether Mathematical's output should be a base64-encoded SVG string | `false`
-| `:maxsize` | A numeral indicating the `MAXSIZE` the output string can be. | `unsigned long`
-| `:format` | A symbol indicating whether you want an `:svg`, `:png`, or `:mathml` output. | `:svg`
-| `:delimiter` | A symbol indicating whether you want an `:DOLLAR` for inline (`$..$`), `:DOUBLE` for display (`$$..$$`), `:PARENS` for inline (`\(..\)`), `:BRACKETS` for display (`[..\]`), or `:ENVIRONMENTS` for parsing bare `\\begin..\\end` environments. You can also pass in an array of symbols to have multiple delimiters considered. | `[:DOLLAR, :DOUBLE]`
+| `"ppi"` | A double determining the pixels per inch of the resulting SVG | `72.0`
+| `"zoom"` | A double determining the zoom level of the resulting SVG | `1.0`
+| `"base64"` | A boolean determining whether Mathematical's output should be a base64-encoded SVG string | `False`
+| `"maxsize"` | A numeral indicating the `MAXSIZE` the output string can be. | `unsigned long`
+| `"format"` | A string indicating whether you want an `"svg"`, `"png"`, or `"mathml"` output. | `"svg"`
+| `"delimiter"` | A string indicating whether you want an `"dollar"` for inline (`$..$`), `"double"` for display (`$$..$$`), `"parens"` for inline (`\(..\)`), `"brackets"` for display (`[..\]`), or `"environments"` for parsing bare `\\begin..\\end` environments. You can also pass in an array of strings to have multiple delimiters considered. | `["dollar", "double"]`
 
 Pass these in like this:
 
 ``` ruby
-options = { :ppi => 200.0, :zoom => 5.0, :base64 => true }
-renderer = Mathematical.new(options)
+options = {"ppi": 200.0, "zoom": 5.0, "base64": True}
+renderer = Mathematical(options)
 renderer.render('$a \ne b$')
 ```
 
@@ -107,6 +91,7 @@ Check out [SUPPORTED.md on the mtex2MML website](https://github.com/gjtorikian/m
 **Note**: This library makes a few assumptions about the strings that you pass in. It assumes that `$..$` is inline math and `$$..$$` is display math.
 
 ## Building
+TODO: Update dependencies
 
 Before building this gem, you must install the following libraries:
 
@@ -250,18 +235,3 @@ rendered in moments.
 
 And thus a wrapper was born.
 
-## More math stuff
-
-Check out [math-to-itex](https://github.com/gjtorikian/math-to-itex/), which quickly
-parses out TeX notation from strings.
-
-With it, you could do something fun like:
-
-``` ruby
-MathToItex(string).convert do |eq, type|
-  svg_content = Mathematical.new(:base64 => true).render(eq)
-
-  # create image tags of math with base64-encoded SVGs
-  %|<img class="#{type.to_s}-math" data-math-type="#{type.to_s}-math" src="#{svg_content}"/>|
-end
-```
