@@ -2,7 +2,7 @@
 
 Quickly convert math equations into beautiful SVGs (or PNGs/MathML).
 
-This is a Python translation of the Ruby library Mathematical by Garen Torikian. The rest of this readme is based on the original readme, with the necessary modifications for using the python syntax.
+This is a Python translation of the Ruby library [Mathematical](https://github.com/gjtorikian/mathematical) by Garen Torikian. The rest of this readme is based on the original readme, with the necessary modifications for using the python syntax.
 
 ![Mathematical](https://i.imgur.com/JC7HT32.gif)
 
