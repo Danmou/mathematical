@@ -45,9 +45,9 @@ The output will be a dictionary, with keys that depend on the format you want:
 * `text_filter`: Given a string with a mix of TeX math and non-math elements, this converts all the math and leaves the rest of the string unmodified.
 * `strict_filter`:  Given a string with a mix of TeX math and non-math elements, this converts all the math and leaves the rest of the string unmodified. HTML tags are removed completely.
 
-### Array of equations
+### List of equations
 
-Rather than just a string, you can also provide an array of math inputs:
+Rather than just a string, you can also provide an list of math inputs:
 
 ``` python
 inputs = ['$\pi$', '$not__thisisnotreal$', '$\alpha$']
@@ -55,7 +55,7 @@ inputs = ['$\pi$', '$not__thisisnotreal$', '$\alpha$']
 mathematical.render(inputs)
 ```
 
-This returns an array of dictionaries, rendering the indices. For example, for the above, you will receive the following output:
+This returns an list of dictionaries, rendering the indices. For example, for the above, you will receive the following output:
 
 ```
 [ {"data": "...", "width": ... }, { "data": '$not__thisisnotreal$', "exception": "...", {"data": "...", "width": ... }]
@@ -65,7 +65,7 @@ That is, while the first and last elements are valid TeX math, the middle one is
 
 ### Options
 
-The `Mathematical()` takes an optional hash to define a few options:
+The `Mathematical()` takes an optional dictionary to define a few options:
 
 | Name | Description | Default
 |------|-------------|--------
@@ -74,11 +74,11 @@ The `Mathematical()` takes an optional hash to define a few options:
 | `"base64"` | A boolean determining whether Mathematical's output should be a base64-encoded SVG string | `False`
 | `"maxsize"` | A numeral indicating the `MAXSIZE` the output string can be. | `unsigned long`
 | `"format"` | A string indicating whether you want an `"svg"`, `"png"`, or `"mathml"` output. | `"svg"`
-| `"delimiter"` | A string indicating whether you want an `"dollar"` for inline (`$..$`), `"double"` for display (`$$..$$`), `"parens"` for inline (`\(..\)`), `"brackets"` for display (`[..\]`), or `"environments"` for parsing bare `\\begin..\\end` environments. You can also pass in an array of strings to have multiple delimiters considered. | `["dollar", "double"]`
+| `"delimiter"` | A string indicating whether you want an `"dollar"` for inline (`$..$`), `"double"` for display (`$$..$$`), `"parens"` for inline (`\(..\)`), `"brackets"` for display (`[..\]`), or `"environments"` for parsing bare `\\begin..\\end` environments. You can also pass in an list of strings to have multiple delimiters considered. | `["dollar", "double"]`
 
 Pass these in like this:
 
-``` ruby
+``` python
 options = {"ppi": 200.0, "zoom": 5.0, "base64": True}
 renderer = Mathematical(options)
 renderer.render('$a \ne b$')
