@@ -59,9 +59,7 @@ class Mathematical:
     # about moving to Rust and don't have time to write safe C...
     if result_data["data"] and self.config["format"] != "mathml":
       def repl(match):
-        # Did this ever work??
-        # TODO: test
-        result = self.processer.process(maths, validator.RENDER_TYPES.index("parse"))
+        result = self.processer.process(match, validator.RENDER_TYPES.index("parse"))
         widths.append(result["width"])
         heights.append(result["height"])
         return result["data"]
