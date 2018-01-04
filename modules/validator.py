@@ -1,4 +1,4 @@
-import configuration
+from modules import configuration
 
 FORMAT_TYPES = ["svg", "png", "mathml"]
 RENDER_TYPES = ["parse", "filter", "text_filter", "strict_filter"]

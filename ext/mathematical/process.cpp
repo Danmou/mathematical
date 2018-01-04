@@ -23,13 +23,13 @@
 #include <process.h>
 
 // Raised when the size of the latex string is too large
-static PyObject *py_eMaxsizeError;
+static PyObject *PyExc_MaxsizeError;
 // Raised when the contents could not be parsed
-static PyObject *py_eParseError;
+static PyObject *PyExc_ParseError;
 // Raised when the SVG document could not be created
-static PyObject *py_eDocumentCreationError;
+static PyObject *PyExc_DocumentCreationError;
 // Raised when the SVG document could not be read
-static PyObject *py_eDocumentReadError;
+static PyObject *PyExc_DocumentReadError;
 
 static PyObject *py_init(PyObject *module, PyObject *args)
 {
@@ -39,7 +39,7 @@ static PyObject *py_init(PyObject *module, PyObject *args)
   if (!PyArg_ParseTuple(args, "OO!", &self, &PyDict_Type, &py_Options)) {
     return NULL;
   }
-  PyObject *py_ppi, py_zoom, py_maxsize, py_format, py_delimiter;
+  PyObject *py_ppi, *py_zoom, *py_maxsize, *py_format, *py_delimiter;
 
   py_ppi = PyDict_GetItemString(py_Options, "ppi");
   py_zoom = PyDict_GetItemString(py_Options, "zoom");
@@ -77,7 +77,7 @@ static PyObject *process_rescue(PyObject *args)
 static PyObject *process(PyObject *self, unsigned long maxsize, const char *latex_code, unsigned long latex_size, int delimiter, int parse_type)
 {
   if (latex_size > maxsize) {
-    PyErr_SetString(py_eMaxsizeError, "Size of latex string is greater than the maxsize");
+    PyErr_SetString(PyExc_MaxsizeError, "Size of latex string is greater than the maxsize");
   }
 
   PyObject *result_dict = PyDict_New();
@@ -85,7 +85,7 @@ static PyObject *process(PyObject *self, unsigned long maxsize, const char *late
 
   /* convert the TeX math to MathML */
   char * mathml = lsm_mtex_to_mathml(latex_code, latex_size, delimiter, parse_type);
-  if (mathml == NULL) { PyErr_SetString(py_eParseError, "Failed to parse mtex"); }
+  if (mathml == NULL) { PyErr_SetString(PyExc_ParseError, "Failed to parse mtex"); }
 
   if (format == FORMAT_MATHML || parse_type == TEXT_FILTER) {
     PyDict_SetItemString(result_dict, "data", PyUnicode_FromString(mathml));
@@ -100,7 +100,7 @@ static PyObject *process(PyObject *self, unsigned long maxsize, const char *late
 
   lsm_mtex_free_mathml_buffer(mathml);
 
-  if (document == NULL) { PyErr_SetString(py_eDocumentCreationError, "Failed to create document"); }
+  if (document == NULL) { PyErr_SetString(PyExc_DocumentCreationError, "Failed to create document"); }
 
   LsmDomView *view;
 
@@ -124,7 +124,7 @@ static PyObject *process(PyObject *self, unsigned long maxsize, const char *late
 
   if (format == FORMAT_SVG) {
     surface = cairo_svg_surface_create_for_stream (cairoSvgSurfaceCallback, self, width_pt, height_pt);
-  } else if (format == FORMAT_PNG) {
+  } else { // format == FORMAT_PNG
     surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, width, height);
   }
 
@@ -149,18 +149,18 @@ static PyObject *process(PyObject *self, unsigned long maxsize, const char *late
 
   switch (format) {
   case FORMAT_SVG: {
-    if (PyObject_GetAttrString(self, "svg") == Py_None) { PyErr_SetString(py_eDocumentReadError, "Failed to read SVG contents"); }
+    if (PyObject_GetAttrString(self, "svg") == Py_None) { PyErr_SetString(PyExc_DocumentReadError, "Failed to read SVG contents"); }
     PyDict_SetItemString(result_dict, "data", PyObject_GetAttrString(self, "svg"));
     break;
   }
   case FORMAT_PNG: {
-    if (PyObject_GetAttrString(self, "png") == Py_None) { PyErr_SetString(py_eDocumentReadError, "Failed to read PNG contents"); }
+    if (PyObject_GetAttrString(self, "png") == Py_None) { PyErr_SetString(PyExc_DocumentReadError, "Failed to read PNG contents"); }
     PyDict_SetItemString(result_dict, "data", PyObject_GetAttrString(self, "png"));
     break;
   }
   default: {
     /* should be impossible, Python code prevents this */
-    PyErr_SetString(py_eTypeError, "not valid format");
+    PyErr_SetString(PyExc_TypeError, "not valid format");
     break;
   }
   }
@@ -205,12 +205,12 @@ static PyObject *py_process(PyObject *module, PyObject *args)
   PyObject *output;
 
   if (PyUnicode_Check(py_Input)) {
-    latex_code = PyUnicode_AsString(py_Input);
+    latex_code = PyBytes_AsString(PyUnicode_AsASCIIString(py_Input)); // TODO: unicode support?
     latex_size = (unsigned long) strlen(latex_code);
 
-    output = process(self, maxsize, latex_code, latex_size, delimiter, parse_type)
+    output = process(self, maxsize, latex_code, latex_size, delimiter, parse_type);
     if (PyErr_Occurred() != NULL) {
-      output = process_rescue(latex_code);
+      output = process_rescue(PyUnicode_FromString(latex_code));
       // Clear error here?
     }
   } else if (PyList_Check(py_Input)) {
@@ -223,12 +223,12 @@ static PyObject *py_process(PyObject *module, PyObject *args)
       PyObject *math = PyList_GetItem(py_Input, i);
 
       /* get the string and length */
-      latex_code = PyUnicode_AsString(math);
+      latex_code = PyBytes_AsString(PyUnicode_AsASCIIString(math)); // TODO: unicode support?
       latex_size = (unsigned long) strlen(latex_code);
 
-      dict = process(self, maxsize, latex_code, latex_size, delimiter, parse_type)
+      dict = process(self, maxsize, latex_code, latex_size, delimiter, parse_type);
       if (PyErr_Occurred() != NULL) {
-        dict = process_rescue(latex_code);
+        dict = process_rescue(PyUnicode_FromString(latex_code));
         // Clear error here?
       }
 
@@ -236,7 +236,7 @@ static PyObject *py_process(PyObject *module, PyObject *args)
     }
   } else {
     /* should be impossible, Python code prevents this */
-    PyErr_SetString(py_eTypeError, "not valid value");
+    PyErr_SetString(PyExc_TypeError, "not valid value");
     output = (PyObject *) NULL;
   }
 
@@ -269,18 +269,18 @@ PyMODINIT_FUNC PyInit_process(void)
   }
 
   // Exception definitions
-  py_eMaxsizeError = PyErr_NewException("MaxsizeError");
-  py_eParseError = PyErr_NewException("ParseError");
-  py_eDocumentCreationError = PyErr_NewException("DocumentCreationError");
-  py_eDocumentReadError = PyErr_NewException("DocumentReadError");
-  Py_INCREF(py_eMaxsizeError);
-  Py_INCREF(py_eParseError);
-  Py_INCREF(py_eDocumentCreationError);
-  Py_INCREF(py_eDocumentReadError);
-  PyModule_AddObject(module, "MaxsizeError", py_eStandardError);
-  PyModule_AddObject(module, "ParseError", py_eStandardError);
-  PyModule_AddObject(module, "DocumentCreationError", py_eStandardError);
-  PyModule_AddObject(module, "DocumentReadError", py_eStandardError);
+  PyExc_MaxsizeError = PyErr_NewException("process.MaxsizeError", NULL, NULL);
+  PyExc_ParseError = PyErr_NewException("process.ParseError", NULL, NULL);
+  PyExc_DocumentCreationError = PyErr_NewException("process.DocumentCreationError", NULL, NULL);
+  PyExc_DocumentReadError = PyErr_NewException("process.DocumentReadError", NULL, NULL);
+  Py_INCREF(PyExc_MaxsizeError);
+  Py_INCREF(PyExc_ParseError);
+  Py_INCREF(PyExc_DocumentCreationError);
+  Py_INCREF(PyExc_DocumentReadError);
+  PyModule_AddObject(module, "MaxsizeError", PyExc_MaxsizeError);
+  PyModule_AddObject(module, "ParseError", PyExc_ParseError);
+  PyModule_AddObject(module, "DocumentCreationError", PyExc_DocumentCreationError);
+  PyModule_AddObject(module, "DocumentReadError", PyExc_DocumentReadError);
 
   return module;
 }

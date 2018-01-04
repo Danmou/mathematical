@@ -9,6 +9,8 @@ This is a Python translation of the Ruby library [Mathematical](https://github.c
 ## Installation
 TODO
 
+Requirement: pkgconfig
+
 ## Usage
 
 The simplest way to do this is

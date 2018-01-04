@@ -1,7 +1,7 @@
 #ifndef CAIRO_OVERRIDES_H
 #define CAIRO_OVERRIDES_H
 
-#include "ruby.h"
+#include <Python.h>
 
 #include <cairo-svg.h>
 

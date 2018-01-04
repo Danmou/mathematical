@@ -15,6 +15,7 @@
 #include <glib/gprintf.h>
 #include <gio/gio.h>
 #include <cairo-svg.h>
+#include <mtex2MML.h>
 
 #include <cairo_callbacks.h>
 #include <lasem_overrides.h>

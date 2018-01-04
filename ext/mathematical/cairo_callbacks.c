@@ -2,24 +2,24 @@
 
 cairo_status_t cairoSvgSurfaceCallback (void *closure, const unsigned char *data, unsigned int length)
 {
-  VALUE self = (VALUE) closure;
-  if (rb_iv_get(self, "@svg") == Qnil) {
-    rb_iv_set(self, "@svg", rb_str_new2(""));
+  PyObject *self = (PyObject *) closure;
+  if (PyObject_GetAttrString(self, "svg") == Py_None) {
+    PyObject_SetAttrString(self, "svg", PyUnicode_FromString(""));
   }
 
-  rb_str_cat(rb_iv_get(self, "@svg"), data, length);
+  PyObject_SetAttrString(self, "png", PyUnicode_Concat(PyObject_GetAttrString(self, "svg"), PyUnicode_FromStringAndSize((char *) data, length)));
 
   return CAIRO_STATUS_SUCCESS;
 }
 
 cairo_status_t cairoPngSurfaceCallback (void *closure, const unsigned char *data, unsigned int length)
 {
-  VALUE self = (VALUE) closure;
-  if (rb_iv_get(self, "@png") == Qnil) {
-    rb_iv_set(self, "@png", rb_str_new2(""));
+  PyObject *self = (PyObject *) closure;
+  if (PyObject_GetAttrString(self, "png") == Py_None) {
+    PyObject_SetAttrString(self, "png", PyUnicode_FromString(""));
   }
 
-  rb_str_cat(rb_iv_get(self, "@png"), data, length);
+  PyObject_SetAttrString(self, "png", PyUnicode_Concat(PyObject_GetAttrString(self, "png"), PyUnicode_FromStringAndSize((char *) data, length)));
 
   return CAIRO_STATUS_SUCCESS;
 }
